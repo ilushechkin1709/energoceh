@@ -3,4 +3,4 @@ services:
     name: energoceh
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: /opt/render/project/.venv/bin/gunicorn app:app
