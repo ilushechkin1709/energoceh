@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="grid gap-6">
+    <div class="text-center mb-6">
+        <!-- Логотип убираем, оставляем только текст -->
+        <h1 class="text-3xl font-bold text-gray-800">МУП «Калугатеплосеть»</h1>
+        <h2 class="text-xl text-gray-600">Цех по ремонту и обслуживанию энергетического оборудования</h2>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-3 text-center">
+        <div class="bg-white shadow rounded-2xl p-4">
+            <img src="{{ url_for('static', filename='images/chief.jpg') }}" class="w-24 h-24 rounded-full mx-auto mb-2" alt="Начальник">
+            <h3 class="font-semibold text-gray-800">Иванов Иван Иванович</h3>
+            <p class="text-sm text-gray-600">Начальник цеха</p>
+            <p><a href="tel:+74722555100" class="text-blue-600">+7 (4722) 555-100</a></p>
+            <p><a href="mailto:ivanov@example.com" class="text-blue-600">ivanov@example.com</a></p>
+        </div>
+
+        <div class="bg-white shadow rounded-2xl p-4">
+            <img src="{{ url_for('static', filename='images/deputy1.jpg') }}" class="w-24 h-24 rounded-full mx-auto mb-2" alt="Заместитель по эксплуатации">
+            <h3 class="font-semibold text-gray-800">Петров Петр Петрович</h3>
+            <p class="text-sm text-gray-600">Зам. по эксплуатации</p>
+            <p><a href="tel:+74722555101" class="text-blue-600">+7 (4722) 555-101</a></p>
+            <p><a href="mailto:petrov@example.com" class="text-blue-600">petrov@example.com</a></p>
+        </div>
+
+        <div class="bg-white shadow rounded-2xl p-4">
+            <img src="{{ url_for('static', filename='images/deputy2.jpg') }}" class="w-24 h-24 rounded-full mx-auto mb-2" alt="Заместитель по ремонту">
+            <h3 class="font-semibold text-gray-800">Сидоров Сидор Сидорович</h3>
+            <p class="text-sm text-gray-600">Зам. по ремонту</p>
+            <p><a href="tel:+74722555102" class="text-blue-600">+7 (4722) 555-102</a></p>
+            <p><a href="mailto:sidorov@example.com" class="text-blue-600">sidorov@example.com</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

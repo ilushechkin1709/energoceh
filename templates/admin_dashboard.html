@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="admin-dashboard">
+  <h2>Админ-панель</h2>
+
+  <ul class="nav nav-tabs mb-3" id="adminTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">
+        📊 Статистика
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+        👤 Пользователи
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+      {% include 'includes/admin_stats.html' %}
+    </div>
+    <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+      {% include 'includes/admin_users.html' %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Восстановление последней активной вкладки
+    const lastTab = localStorage.getItem("activeAdminTab");
+    if (lastTab) {
+      const triggerEl = document.querySelector(`[data-bs-target="${lastTab}"]`);
+      if (triggerEl) {
+        new bootstrap.Tab(triggerEl).show();
+      }
+    }
+
+    // Сохранение текущей вкладки
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+    tabButtons.forEach(button => {
+      button.addEventListener("shown.bs.tab", e => {
+        const tabId = e.target.getAttribute("data-bs-target");
+        localStorage.setItem("activeAdminTab", tabId);
+      });
+    });
+
+    // Инициализация toasts (повторная защита, если base не сработал)
+    const toastEls = document.querySelectorAll('.toast');
+    toastEls.forEach(toast => new bootstrap.Toast(toast).show());
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+<h3>Управление пользователями</h3>
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('add_user') }}" class="btn btn-success">➕ Добавить пользователя</a>
+    <a href="{{ url_for('export_users') }}" class="btn btn-outline-primary">⬇️ Экспорт пользователей</a>
+    <button type="button" class="btn btn-outline-success" onclick="document.getElementById('importExcelInput').click();">⬆️ Импорт из Excel</button>
+  </div>
+</div>
+
+<form id="importExcelForm" action="{{ url_for('import_users') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+  <input type="file" id="importExcelInput" name="file" accept=".xlsx" onchange="document.getElementById('importExcelForm').submit();">
+</form>
+
+{% with toast_message = request.cookies.get('toast_message'), toast_category = request.cookies.get('toast_category') %}
+  {% if toast_message %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast align-items-center text-white bg-{{ toast_category or 'info' }} border-0 show" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ toast_message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" id="users-form">
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Удалить пользователя</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">
+          Вы уверены, что хотите удалить этого пользователя?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="button" class="btn btn-danger" id="deleteConfirmButton">Удалить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table id="users-table" class="table table-striped table-bordered align-middle">
+    <thead>
+      <tr>
+        <th>Фамилия</th>
+        <th>Имя</th>
+        <th>Логин</th>
+        <th>Пароль</th>
+        <th>Роль</th>
+        <th>Блокировка</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr class="{% if user.is_blocked %}table-danger{% elif user.role == 'admin' %}table-primary{% elif user.role == 'manager' %}table-success{% elif user.role == 'worker' %}table-warning{% endif %}">
+        <td><input type="text" name="users[{{ user.id }}][last_name]" class="form-control" value="{{ user.last_name }}" title="Фамилия пользователя"></td>
+        <td><input type="text" name="users[{{ user.id }}][first_name]" class="form-control" value="{{ user.first_name }}" title="Имя пользователя"></td>
+        <td><input type="text" name="users[{{ user.id }}][username]" class="form-control" value="{{ user.username }}" title="Логин для входа"></td>
+        <td><input type="text" name="users[{{ user.id }}][password]" class="form-control" value="{{ user.temp_password or '' }}" placeholder="Пароль или временный пароль" title="Если есть временный пароль, он здесь, иначе пустое поле"></td>
+        <td>
+          <select name="users[{{ user.id }}][role]" class="form-select role-select" data-initial="{{ user.role }}" title="Роль пользователя">
+            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Админ</option>
+            <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>АУП</option>
+            <option value="worker" {% if user.role == 'worker' %}selected{% endif %}>Рабочий</option>
+            <option value="new" {% if user.role == 'new' %}selected{% endif %}>Ожидает</option>
+          </select>
+        </td>
+        <td class="text-center">
+          <input type="checkbox" name="users[{{ user.id }}][is_blocked]" {% if user.is_blocked %}checked{% endif %} title="Пользователь заблокирован">
+        </td>
+        <td>
+          {% if user.id != current_user.id %}
+          <button type="submit" name="action" value="save_{{ user.id }}" class="btn btn-primary btn-sm d-none">💾 Сохранить</button>
+          <button type="button" data-bs-toggle="modal" data-bs-target="#deleteModal" class="btn btn-danger btn-sm" data-user-id="{{ user.id }}">🗑️ Удалить</button>
+          {% else %}
+          <span class="text-muted">Вы</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+$(document).ready(function () {
+  $('#users-table').DataTable({
+    language: {
+      search: "Поиск:",
+      lengthMenu: "Показать _MENU_ записей на страницу",
+      zeroRecords: "Ничего не найдено",
+      info: "Показано _START_–_END_ из _TOTAL_ записей",
+      infoEmpty: "Нет записей",
+      infoFiltered: "(отфильтровано из _MAX_ записей)",
+      paginate: {
+        first: "Первая",
+        last: "Последняя",
+        next: "Следующая",
+        previous: "Предыдущая"
+      }
+    },
+    ordering: false,
+    order: [[0, 'asc']],
+    stateSave: true,
+  });
+
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  });
+
+  $('#users-table tbody').on('input change', 'input, select', function() {
+    var $row = $(this).closest('tr');
+    var $saveBtn = $row.find('button[type="submit"][name^="action"][value^="save_"]');
+    if ($saveBtn.length) {
+      $saveBtn.removeClass('d-none');
+    }
+  });
+
+  $('#deleteModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var userId = button.data('user-id');
+    $(this).data('user-id', userId);
+  });
+
+  $('#deleteConfirmButton').off('click').on('click', function () {
+    var modal = $('#deleteModal');
+    var userId = modal.data('user-id');
+    $('<form>', {
+      method: 'POST',
+      html: $('<input>', {
+        type: 'hidden',
+        name: 'action',
+        value: 'delete_' + userId
+      })
+    }).appendTo('body').submit();
+  });
+
+  $('#users-table').on('change', '.role-select', function() {
+    var newRole = $(this).val();
+    var initialRole = $(this).data('initial');
+    if (newRole === 'admin' && initialRole !== 'admin') {
+      if (!confirm("Вы уверены, что хотите сделать пользователя администратором?")) {
+        $(this).val(initialRole);
+      } else {
+        $(this).data('initial', newRole);
+      }
+    }
+  });
+});
+</script>

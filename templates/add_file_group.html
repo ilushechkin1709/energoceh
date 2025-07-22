@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Добавить группу{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>
+        {% if parent_group %}
+            Добавить подгруппу в "{{ parent_group.name }}"
+        {% else %}
+            Добавить группу файлов для объекта: {{ facility.name }}
+        {% endif %}
+    </h3>
+
+    <form method="POST">
+      <div class="mb-3">
+        <label for="group_name" class="form-label">Название группы</label>
+        <input type="text" name="group_name" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Создать</button>
+      <a href="{{ url_for('facility_detail', facility_id=facility.id) }}" class="btn btn-secondary">Назад</a>
+    </form>
+</div>
+{% endblock %}

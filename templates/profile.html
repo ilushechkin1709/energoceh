@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4 d-flex justify-content-center">
+    <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+        <div class="text-center">
+            <label for="avatar-upload" style="cursor: pointer;">
+                {% if current_user.avatar and current_user.avatar != 'default.png' %}
+                    <img src="{{ url_for('avatar', filename=current_user.avatar) }}"
+                        alt="Аватар"
+                        class="rounded-circle mb-3 shadow"
+                        width="150" height="150" style="object-fit: cover;">
+                {% else %}
+                    <img src="{{ url_for('avatar', filename='default.png') }}"
+                        alt="Аватар по умолчанию"
+                        class="rounded-circle mb-3 shadow"
+                        width="150" height="150" style="object-fit: cover;">
+                {% endif %}
+            </label>
+            <input type="file" name="avatar" id="avatar-upload" accept="image/*" hidden>
+            <h4>{{ current_user.last_name }} {{ current_user.first_name }}</h4>
+        </div>
+        <hr>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group mb-3">
+                <label for="first_name">Имя *</label>
+                <input type="text" class="form-control" name="first_name" value="{{ current_user.first_name }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="last_name">Фамилия *</label>
+                <input type="text" class="form-control" name="last_name" value="{{ current_user.last_name }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="birth_date">Дата рождения</label>
+                <input type="date" class="form-control" name="birth_date"
+                       value="{{ current_user.birth_date or '' }}">
+            </div>
+            <div class="form-group mb-3">
+                <label for="phone">Телефон *</label>
+                <input type="text" class="form-control" name="phone" value="{{ current_user.phone }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" name="email" value="{{ current_user.email or '' }}">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById("avatar-upload").addEventListener("change", function () {
+        this.form.submit();
+    });
+</script>
+
+{% endblock %}

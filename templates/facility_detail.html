@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ facility.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <h2 class="mb-0">{{ facility.name }}</h2>
+        <a href="{{ url_for('edit_facility', facility_id=facility.id) }}" class="btn btn-sm btn-warning">✏️ Редактировать объект</a>
+    </div>
+
+    <p><strong>Тип:</strong> {{ facility.type }}</p>
+    <p><strong>Район:</strong> {{ facility.district }}</p>
+    <p><strong>Описание:</strong> {{ facility.description }}</p>
+
+    <div class="mb-3 d-flex flex-wrap gap-2">
+        <a href="{{ url_for('add_file_group', facility_id=facility.id) }}" class="btn btn-outline-primary">📁➕ Группа</a>
+        <a href="{{ url_for('upload_file', facility_id=facility.id) }}" class="btn btn-primary">📎 Добавить файл</a>
+        <a href="{{ url_for('facilities') }}" class="btn btn-secondary">↩️ Назад</a>
+    </div>
+
+    {% macro render_group(group) %}
+    <div class="mb-4 border rounded p-3">
+        <h5 class="d-flex justify-content-between align-items-center">
+            <span>{{ group.icon }} {{ group.name }}</span>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('upload_file', facility_id=group.facility_id, group_id=group.id) }}" class="btn btn-sm btn-outline-success">➕ Файл</a>
+                <a href="{{ url_for('add_subgroup', facility_id=group.facility_id, parent_group_id=group.id) }}" class="btn btn-sm btn-outline-secondary">➕ Подгруппа</a>
+                <form method="POST" action="{{ url_for('delete_file_group', group_id=group.id) }}" onsubmit="return confirm('Удалить группу файлов?');">
+                    <button class="btn btn-sm btn-danger">Удалить</button>
+                </form>
+            </div>
+        </h5>
+
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            {% for doc in group.documents %}
+                {% if doc.file_type == 'photo' %}
+                <div style="width: 100px;">
+                    <img src="{{ url_for('download_file', filename=doc.file_path) }}" class="img-thumbnail" style="height: 80px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="{{ url_for('download_file', filename=doc.file_path) }}">
+                    <p class="small text-truncate" title="{{ doc.name }}">{{ doc.name }}</p>
+                    <form method="POST" action="{{ url_for('delete_file', file_id=doc.id) }}">
+                        <button class="btn btn-sm btn-danger">Удалить</button>
+                    </form>
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('move_file', file_id=doc.id) }}" class="btn btn-sm btn-outline-secondary mt-1">🔀 Переместить</a>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="d-flex flex-column align-items-start" style="min-width: 180px;">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="bi bi-file-earmark-text-fill fs-3 me-2"></i>
+                        <div>
+                            <p class="mb-0 text-truncate" style="max-width: 150px;" title="{{ doc.name }}">{{ doc.name }}</p>
+                            <a href="{{ url_for('download_file', filename=doc.file_path) }}" class="btn btn-sm btn-outline-primary">Скачать</a>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ url_for('delete_file', file_id=doc.id) }}">
+                        <button class="btn btn-sm btn-danger mt-1">Удалить</button>
+                    </form>
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('move_file', file_id=doc.id) }}" class="btn btn-sm btn-outline-secondary mt-1">🔀 Переместить</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if group.children %}
+        <div class="ms-4 mt-3">
+            {% for subgroup in group.children %}
+                {{ render_group(subgroup) }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endmacro %}
+
+    <h3 class="mt-4">Группы файлов</h3>
+    {% for group in facility.file_groups if not group.parent_id %}
+        {{ render_group(group) }}
+    {% else %}
+        <p class="text-muted">Групп файлов нет.</p>
+    {% endfor %}
+
+    {# Файлы без группы — документы #}
+    {% set ungrouped_docs = facility.documents | selectattr('group_id', 'none') | selectattr('file_type', 'ne', 'photo') | list %}
+    {% if ungrouped_docs %}
+    <h4 class="mt-5">📄 Без группы: Документы</h4>
+    <div class="row">
+        {% for doc in ungrouped_docs %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ doc.name }}</h5>
+                    <p>{{ doc.description }}</p>
+                    <p class="text-muted small">Файл: {{ doc.original_name or doc.file_path }}</p>
+                    {% if doc.file_path.endswith('.pdf') %}
+                        <a href="{{ url_for('download_file', filename=doc.file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Открыть PDF</a>
+                    {% else %}
+                        <a href="{{ url_for('download_file', filename=doc.file_path) }}" class="btn btn-sm btn-outline-primary" download="{{ doc.original_name or doc.file_path }}">Скачать</a>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('delete_file', file_id=doc.id) }}">
+                        <button class="btn btn-danger btn-sm mt-2">Удалить</button>
+                    </form>
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('move_file', file_id=doc.id) }}" class="btn btn-sm btn-outline-secondary mt-1">🔀 Переместить</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Файлы без группы — фотографии #}
+    {% set ungrouped_photos = facility.documents | selectattr('group_id', 'none') | selectattr('file_type', 'equalto', 'photo') | list %}
+    {% if ungrouped_photos %}
+    <h4 class="mt-4">🖼 Без группы: Фотографии</h4>
+    <div class="row">
+        {% for photo in ungrouped_photos %}
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <img src="{{ url_for('download_file', filename=photo.file_path) }}" class="card-img-top img-thumbnail" style="height: 150px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="{{ url_for('download_file', filename=photo.file_path) }}">
+                <div class="card-body">
+                    <p class="card-text">{{ photo.name }}</p>
+                    <form method="POST" action="{{ url_for('delete_file', file_id=photo.id) }}">
+                        <button class="btn btn-danger btn-sm">Удалить</button>
+                    </form>
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('move_file', file_id=photo.id) }}" class="btn btn-sm btn-outline-secondary mt-1">🔀 Переместить</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Модальное окно для увеличения -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-0">
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" style="max-width: 100%; max-height: 80vh;" class="img-fluid rounded shadow">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const imageModal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+
+    imageModal.addEventListener('show.bs.modal', function (event) {
+        const triggerImg = event.relatedTarget;
+        const imgSrc = triggerImg.getAttribute('data-img-src');
+        modalImage.src = imgSrc;
+    });
+});
+</script>
+{% endblock %}

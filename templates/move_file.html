@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>🔀 Перемещение файла: {{ file.name }}</h3>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Выбрать объект</label>
+            <select name="facility_id" id="facility-select" class="form-select" required
+                    data-selected-group="{{ file.group_id | tojson }}">
+                {% for f in facilities %}
+                    <option value="{{ f.id }}" {% if f.id == file.facility_id %}selected{% endif %}>{{ f.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Группа файлов (необязательно)</label>
+            <select name="group_id" id="group-select" class="form-select">
+                <option value="">Без группы</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Переместить</button>
+        <a href="{{ url_for('facility_detail', facility_id=file.facility_id) }}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+
+<script>
+    const facilitySelect = document.getElementById('facility-select');
+    const groupSelect = document.getElementById('group-select');
+    // Получаем выбранную группу из data-атрибута (строка, число или null)
+    const selectedGroupId = JSON.parse(facilitySelect.dataset.selectedGroup || 'null');
+
+    async function loadGroups(facilityId, selectedGroupId = null) {
+        const res = await fetch(`/api/facility/${facilityId}/groups`);
+        const data = await res.json();
+        groupSelect.innerHTML = '<option value="">Без группы</option>';
+        for (const group of data.groups) {
+            const opt = document.createElement('option');
+            opt.value = group.id;
+            opt.textContent = group.name;
+            // Приводим к числу для сравнения, так как атрибуты из HTML — строки
+            if (selectedGroupId !== null && group.id === Number(selectedGroupId)) {
+                opt.selected = true;
+            }
+            groupSelect.appendChild(opt);
+        }
+    }
+
+    facilitySelect.addEventListener('change', () => {
+        loadGroups(facilitySelect.value);
+    });
+
+    // При загрузке — загрузим группы для выбранного объекта
+    loadGroups(facilitySelect.value, selectedGroupId);
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать объект{% endblock %}
+{% block content %}
+<h2>Редактировать объект: {{ facility.name }}</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Название</label>
+    <input type="text" class="form-control" name="name" value="{{ facility.name }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Описание</label>
+    <textarea class="form-control" name="description">{{ facility.description }}</textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Тип</label>
+    <select class="form-control" name="type">
+      {% for t in types %}
+      <option value="{{ t }}" {% if facility.type == t %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Район</label>
+    <select class="form-control" name="district">
+      {% for d in districts %}
+      <option value="{{ d }}" {% if facility.district == d %}selected{% endif %}>{{ d }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+  <a href="{{ url_for('facility_detail', facility_id=facility.id) }}" class="btn btn-secondary">Назад</a>
+</form>
+{% endblock %}

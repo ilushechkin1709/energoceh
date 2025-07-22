@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4 text-center">Руководство</h1>
+
+  <div class="row g-4">
+    <!-- Начальник -->
+    <div class="col-md-4">
+      <div class="card shadow-sm text-center h-100">
+        <img src="{{ url_for('static', filename='images/boss.jpg') }}" class="card-img-top" alt="Начальник">
+        <div class="card-body">
+          <h5 class="card-title">Иванов Иван Иванович</h5>
+          <p class="card-text text-muted">Начальник цеха</p>
+          <p>📞 +7 (4842) 00-00-00<br>✉️ ivanov@example.com</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Зам. по ремонту -->
+    <div class="col-md-4">
+      <div class="card shadow-sm text-center h-100">
+        <img src="{{ url_for('static', filename='images/repair_deputy.jpg') }}" class="card-img-top" alt="Зам по ремонту">
+        <div class="card-body">
+          <h5 class="card-title">Петров Пётр Петрович</h5>
+          <p class="card-text text-muted">Заместитель начальника по ремонту</p>
+          <p>📞 +7 (4842) 11-11-11<br>✉️ petrov@example.com</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Зам. по эксплуатации -->
+    <div class="col-md-4">
+      <div class="card shadow-sm text-center h-100">
+        <img src="{{ url_for('static', filename='images/operation_deputy.jpg') }}" class="card-img-top" alt="Зам по эксплуатации">
+        <div class="card-body">
+          <h5 class="card-title">Сидоров Сидор Сидорович</h5>
+          <p class="card-text text-muted">Заместитель начальника по эксплуатации</p>
+          <p>📞 +7 (4842) 22-22-22<br>✉️ sidorov@example.com</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if is_authenticated %}
+  <hr class="my-5">
+
+  <h2 class="mb-4 text-center">Внутренняя информация</h2>
+
+  <div class="row g-4">
+    <!-- Шаблоны писем -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">📄 Шаблоны писем</h5>
+          <p class="card-text">Скачайте актуальные шаблоны служебных и пояснительных записок.</p>
+          <a href="{{ url_for('static', filename='docs/letter_template.docx') }}" class="btn btn-outline-primary">Скачать</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Аварийные телефоны -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">📞 Аварийные службы</h5>
+          <ul class="list-unstyled">
+            <li><strong>Калугаэнерго:</strong> 8-800-123-45-67</li>
+            <li><strong>Горводоканал:</strong> 8-800-765-43-21</li>
+            <li><strong>Газовая служба:</strong> 04</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Структура подразделения -->
+    <div class="col-md-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">🏗 Структура цеха</h5>
+          <p>Ознакомьтесь с внутренней структурой подразделения.</p>
+          <a href="{{ url_for('static', filename='docs/structure.pdf') }}" target="_blank" class="btn btn-outline-secondary">Открыть PDF</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h3 class="text-center mb-4">Мастера участка</h3>
+    <div class="row g-4">
+      <!-- Пример мастера -->
+      <div class="col-md-3">
+        <div class="card shadow-sm text-center h-100">
+          <img src="{{ url_for('static', filename='images/master1.jpg') }}" class="card-img-top" alt="Мастер Иванов">
+          <div class="card-body">
+            <h6 class="card-title">Иванов А.А.</h6>
+            <p class="card-text">Мастер участка №1</p>
+            <p>📞 8-920-000-11-22</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Добавь других мастеров по аналогии -->
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

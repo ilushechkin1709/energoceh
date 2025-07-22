@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}О предприятии{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4 text-center" data-aos="fade-up">Муниципальное унитарное предприятие "Калугатеплосеть"</h1>
+
+  <div class="row align-items-center mb-5">
+    <div class="col-md-6" data-aos="fade-right">
+      <img src="{{ url_for('static', filename='images/enterprise_building.jpg') }}" alt="Предприятие" class="img-fluid rounded shadow">
+    </div>
+    <div class="col-md-6" data-aos="fade-left">
+      <p>
+        Мы — Цех по ремонту и обслуживанию энергетического оборудования г. Калуги.
+        Обеспечиваем надежную работу котельных, теплосетей и энергетического оборудования,
+        способствуя комфортному жизнеобеспечению жителей и предприятий города.
+      </p>
+      <p>
+        Наш коллектив — это высококвалифицированные специалисты, которые постоянно совершенствуют свои знания и умения,
+        чтобы обеспечить максимальную эффективность и безопасность работы оборудования.
+      </p>
+      <p>
+        Мы предлагаем полный спектр услуг по ремонту, обслуживанию и модернизации энергетического оборудования.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+      <img src="{{ url_for('static', filename='images/service1.jpg') }}" alt="Ремонт оборудования" class="img-fluid rounded shadow mb-3">
+      <h5>Ремонт оборудования</h5>
+      <p>Качественные и своевременные ремонтные работы.</p>
+    </div>
+    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+      <img src="{{ url_for('static', filename='images/service2.jpg') }}" alt="Обслуживание" class="img-fluid rounded shadow mb-3">
+      <h5>Плановое обслуживание</h5>
+      <p>Регулярные проверки и профилактика оборудования.</p>
+    </div>
+    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
+      <img src="{{ url_for('static', filename='images/service3.jpg') }}" alt="Модернизация" class="img-fluid rounded shadow mb-3">
+      <h5>Модернизация</h5>
+      <p>Внедрение новых технологий и улучшение эффективности.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Загрузка файла - {{ facility.name }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Загрузить файл для объекта: {{ facility.name }}</h3>
+  <form method="POST" enctype="multipart/form-data">
+    <!-- Название файла -->
+    <div class="mb-3">
+      <label for="name" class="form-label">Название файла <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+
+    <!-- Описание -->
+    <div class="mb-3">
+      <label for="description" class="form-label">Описание</label>
+      <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+    </div>
+
+    <!-- Тип файла -->
+    <div class="mb-3">
+      <label for="file_type" class="form-label">Тип файла <span class="text-danger">*</span></label>
+      <select class="form-select" id="file_type" name="file_type" required>
+        <option value="">Выберите тип файла</option>
+        <option value="photo">Фотография</option>
+        <option value="document">Документ</option>
+      </select>
+    </div>
+
+    <!-- Выбор файла -->
+    <div class="mb-3">
+      <label for="file" class="form-label">Файл <span class="text-danger">*</span></label>
+      <input type="file" class="form-control" id="file" name="file" required>
+    </div>
+
+    <!-- Выбор группы -->
+    <div class="mb-3">
+      <label for="group_id" class="form-label">Группа файлов (необязательно)</label>
+      <select class="form-select" id="group_id" name="group_id">
+        <option value="">Без группы</option>
+        {% for group in groups %}
+          <option value="{{ group.id }}">{{ group.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Загрузить</button>
+    <a href="{{ url_for('facility_detail', facility_id=facility.id) }}" class="btn btn-secondary ms-2">Отмена</a>
+  </form>
+</div>
+{% endblock %}
