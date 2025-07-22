@@ -12,11 +12,13 @@ from openpyxl import load_workbook, Workbook
 import random
 import string
 import secrets
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Flask и БД
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 # Папки для загрузок
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
